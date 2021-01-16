@@ -11,10 +11,9 @@ import {
     TaskItemDelete,
     TaskItemView, TaskTitleWrapper, TaskItemTitleLabel
 } from './styled';
-import FormField from '../../Form/FormField';
-import {initialState, taskReducer, getPageImage} from './handlers';
-import TaskForm from "../../Form/TaskForm";
-import FormButton from "../../Form/FormButton";
+import {initialState, taskReducer, getPageImage, disableCreateButton} from './handlers';
+import PageTaskForm from './components/TaskForm';
+import Image from '../../Image';
 
 const TasksPage = ({taskItems, taskActions}) => {
     const [state, dispatch] = useReducer(taskReducer, initialState);
@@ -23,12 +22,12 @@ const TasksPage = ({taskItems, taskActions}) => {
     useEffect(() => {
         getPageImage(`https://source.unsplash.com/random/800x600/?mars`, setImage)
     }, [])
-
+    
     return (
         <PageContainer>
-            {pageImage ? (
-                <img src={pageImage} alt='img not available' />
-            ) : <p>Loading image...</p>}
+            <Image
+                imageUrl={pageImage}
+            />
 
             <PageContent>
                 <PageLeftSidePanel>
@@ -36,46 +35,21 @@ const TasksPage = ({taskItems, taskActions}) => {
                 </PageLeftSidePanel>
 
                 <PageTaskFormWrapper>
-                    <TaskForm
-                        onSubmit={(event) => event.preventDefault()}
-                    >
-                        <FormField
-                            label='Title'
-                            type='text'
-                            id='title'
-                            value={state.title}
-                            onChange={event => dispatch({type: 'TITLE', payload: event.target.value})}
-                        />
-
-                        <FormField
-                            label='Description'
-                            type='text'
-                            id='description'
-                            value={state.description}
-                            onChange={event => dispatch({type: 'DESCRIPTION', payload: event.target.value})}
-                        />
-
-                        <FormField
-                            label='Created by'
-                            type='text'
-                            id='createdBy'
-                            value={state.createdBy}
-                            onChange={event => dispatch({type: 'CREATED_BY', payload: event.target.value})}
-                        />
-
-                        <FormField
-                            label='Assigned to'
-                            type='text'
-                            id='assignedTo'
-                            value={state.assignedTo}
-                            onChange={event => dispatch({type: 'ASSIGNED_TO', payload: event.target.value})}
-                        />
-
-                        <FormButton
-                            title='Create Task'
-                            onClick={() => taskActions.createTask(state)}
-                        />
-                    </TaskForm>
+                    <PageTaskForm
+                        task={state}
+                        formActions={{
+                            onSubmit: (event) => event.preventDefault(),
+                            updateTitle: event => dispatch({type: 'TITLE', payload: event.target.value}),
+                            updateDescription: event => dispatch({type: 'DESCRIPTION', payload: event.target.value}),
+                            updateCreatedBy: event => dispatch({type: 'CREATED_BY', payload: event.target.value}),
+                            updateAssignedTo: event => dispatch({type: 'ASSIGNED_TO', payload: event.target.value}),
+                            disableCreateButton: disableCreateButton(state),
+                            createTask: () => {
+                                taskActions.createTask(state);
+                                dispatch({type: 'CLEAR_FORM'})
+                            }
+                        }}
+                    />
                 </PageTaskFormWrapper>
 
                 <PageRightPanel>

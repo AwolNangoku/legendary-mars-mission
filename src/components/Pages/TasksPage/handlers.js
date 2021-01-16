@@ -13,8 +13,10 @@ export const taskReducer = (state, action) => {
             return {...state, ...{description: action.payload}}
         case 'CREATED_BY':
             return {...state, ...{createdBy: action.payload}}
-        default:
+        case 'ASSIGNED_TO':
             return {...state, ...{assignedTo: action.payload}}
+        default:
+            return initialState;
     }
 };
 
@@ -26,3 +28,5 @@ export const getPageImage = (imgUrl, setImage) => {
             }
         })
 }
+
+export const disableCreateButton = ({title, description, createdBy}) => !title || !description || !createdBy;
